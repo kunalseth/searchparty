@@ -2,7 +2,7 @@ import pandas as pd
 print("Extractig data from file..")
 xl = pd.ExcelFile("data.xlsx")
 print("Parsing data..")
-df = xl.parse("Data")
+df = xl.parse("Data", skip_footer=3)
 print("Minor data cleaning")
 df.reset_index(inplace=True) 	# to remove multi level index
 new_header = df.iloc[6]	# rows 0-5 are not needed. header present in row 6
