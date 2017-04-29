@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h2> This is the view page</h2>
+
+    <form action="tables", method="post">
+      <fieldset>
+        <legend>Tell baby Tell</legend>
+        <p>
+          <label>Enter number of records you wanna seee baby!</label>
+          <input type = "number"
+                 id = "inputnumber" name="inputnumber" />
+          <input type = "submit" name ="formsubmit" value="Submit!">
+
+        </p>
+      </fieldset>
+    </form>
+
+    <div class=page>
+
+        {% for table in tables %}
+            {{ table|safe }}
+        {% endfor %}
+    </div>
+</body>
+
+</html>

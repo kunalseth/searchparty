@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Relevancy</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <script type="text/javascript" src ="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+    <script type="text/javascript" src ="{{ url_for('static', filename='change.js') }}"></script>
+</head>
+    <script type=text/javascript>
+    $(function() {
+    $('.radiogroup').change(function(e){
+    var selectedValue = $(this).val();
+    $('#amount').val(selectedValue)
+    });
+                 });
+
+    </script>
+
+<body>
+
+    <h2> This is the Results page</h2>
+
+    <form action="relevancy" class="myform", method="post">
+      <fieldset>
+        <legend>Search Options</legend>
+        <p>
+          <label for="compname" id="labelid">Enter Related term!</label>
+          <input type = "text"
+                 id = "compname" name="compname" />
+            <input type = "radio" name="similar" value="relevantresults">Relevant Results</input>
+            <input type = "radio" name="similar" value="similar1">Similar to Company XYZ</input>
+            <input type = "radio" name="similar" value="similar2">Similar to Me</input>
+            <input type = "radio" name="similar" value="similar3">Similar to Investor</input>
+          <input type = "submit" name ="formsubmit" value="Submit!">
+
+        </p>
+      </fieldset>
+    </form>
+
+    <div class=page>
+
+        {% for table in tables %}
+            {{ table|safe }}
+        {% endfor %}
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+    </div>
+
+
+</body>
+</html>
