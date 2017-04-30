@@ -33,6 +33,12 @@ class SearchParty(DataImport):
 
         return df
 
+    def append_filter_values(self, column, value):
+        """
+        Function to store the filter criteria
+        Returns: a list dictionary
+        """
+        return self.filters[column].append(value)
 
     def treat_missing_vals(self, df, treatment):
         """
@@ -144,6 +150,9 @@ if __name__=='__main__':
     data = DataImport()
     df = data.data
     s = SearchParty(data)
+
+    ### Here we might call the functions for filters/company search and 
+    ### then pass the returned filtered data to the functions below
 
     similar_to_uber = s.similar_comp(df,'Uber Technologies')
     similar_to_uber = s.sort(df, similar_to_uber)
