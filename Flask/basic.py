@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
-from dataview import mainclass
 from flask import Flask, request, render_template, flash, redirect, url_for
 from relevantresults import relevant_main
+from rank import SearchParty
+from initialize import DataImport
+
 app = Flask(__name__)
 app.secret_key = 'some_secret'
 
@@ -10,59 +12,59 @@ app.secret_key = 'some_secret'
 @app.route('/')
 def index():
     return render_template('index.html')
-# compulsory stuff
-
-#Just for checking out the methods
-# @app.route('/dummy', methods=['GET', 'POST'])
-# def dummy():
-#     return 'Medhod used %s' % request.method
-
-
-@app.route('/tables', methods=['GET','POST'])
-def tables():
-    classinstance = mainclass()
-    default_value = True
-    input_num = request.form.get('inputnumber', default_value)
-    # input_num = request.form['inputnumber']
-    input_num_i = int(input_num)
-    dataset_tab = classinstance.seedata(input_num_i)
-    return render_template('view.html', tables=[dataset_tab])
 
 @app.route('/relevancy', methods=['GET', 'POST'])
 def relevancy():
+    data = DataImport()
+    df = data.data
+    searchparty_inst = SearchParty(data)
     radio_default = 'relevantresults'
     radio_input = request.form.get('similar', radio_default)
     if request.method == 'GET':
         return render_template('relevancy.html', tables=[])
     else:
-        empty_search = ''
-        if request.form.get('compname',empty_search) == '' and radio_input == 'relevantresults':
-            flash('Enter a search term!')
-            return redirect(url_for('relevancy'))
+        if radio_input == 'relevantresults':
+            #Relevancy Logic
+            column_weights = {"Total Raised": 0.2, "Employees": 0.1, "Growth Rate": 0.3, "# Active Investors": 0.4,
+                              "Social Growth Rate": 0.1}
+            relevance_midresult = searchparty_inst.relevance(df, column_weights)
+            relevance_finalresult = searchparty_inst.sort(df, relevance_midresult).head().to_html()
+            return render_template('relevancy.html', tables=[relevance_finalresult])
+
+
+
+        elif radio_input == 'similar1':
+            #Similar to company logic
+            # data = DataImport()
+            # df = data.data
+            # flash('Similar1')
+            default_value2 = 'Uber Technologies'
+            company_name = request.form.get('compname', default_value2)
+            # searchparty_inst = SearchParty(data)
+            similar1_midresult = searchparty_inst.similar_comp(df,company_name)
+            similar1_finalresult = searchparty_inst.sort(df, similar1_midresult).head().to_html()
+            return render_template('relevancy.html', tables=[similar1_finalresult])
+            # return redirect(url_for('relevancy'))
+
+        elif radio_input == 'similar2':
+            # flash('Similar2')
+            # return redirect(url_for('relevancy'))
+            default_value3 = 'Mackenzie Capital Management'
+            investor_name = request.form.get('compname', default_value3)
+            # searchparty_inst = SearchParty(data)
+            similar2_midresult = searchparty_inst.similar_investor_comp(df, investor_name)
+            similar2_finalresult = searchparty_inst.sort(df, similar2_midresult).head().to_html()
+            return render_template('relevancy.html', tables=[similar2_finalresult])
+
+
         else:
-            if radio_input == 'relevantresults':
-                default_value1 = 'Uber'
-                df = pd.read_csv("data_clean.csv")
-                weight_input = [0,1,0,0,0,0,0]
-                # These are quantitative columns
-                col = ["Total Raised", "Employees", "Growth Rate", "# Active Investors", "Revenue", "Growth Rate Change"]
-                # These are popularity based columns, a single rank is calculated oveall for these columns
-                popcol = ["Social Growth Rate", "Compete Growth Rate", "Web Growth Rate", "Facebook Likes", "Twitter Followers", "Facebook Likes Change"]
-                search_term = request.form.get('compname', default_value1)
-                # search_term = request.form['compname']
-                relevancy_tab = relevant_main(df, search_term, weight_input)
-                mid_result = relevancy_tab.relevance_sort(col, popcol)
-                result_df = mid_result.head().to_html()
-                return render_template('relevancy.html', tables=[result_df])
-            elif radio_input == 'similar1':
-                flash('Similar1')
-                return redirect(url_for('relevancy'))
-            elif radio_input == 'similar2':
-                flash('Similar2')
-                return redirect(url_for('relevancy'))
-            else:
-                flash('Similar3')
-                return redirect(url_for('relevancy'))
+            # flash('Similar3')
+            # return redirect(url_for('relevancy'))
+            default_value4 = 'Mackenzie Capital Management'
+            self_name = request.form.get('compname', default_value4)
+            similar3_midresult = searchparty_inst.similar_investor_comp(df, self_name)
+            similar3_finalresult = searchparty_inst.sort(df, similar3_midresult).head().to_html()
+            return render_template('relevancy.html', tables=[similar3_finalresult])
 
 
 
